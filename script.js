@@ -200,13 +200,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (successTitle) successTitle.textContent = "Google Login Success!";
                     if (successDesc) successDesc.textContent = "Redirecting...";
                     if (successMessage) successMessage.classList.add('show');
-                    setTimeout(() => {
-                        window.location.href = "https://anbyofficial.github.io/JFT-BASIC-A2/";
-                    }, 1500);
-                })
-                .catch((error) => {
-                    alert("Google Sign-In Error: " + error.message);
-                });
-        });
-    }
-});
+                    // Arahkan ke URL penuh repository ujian
+            setTimeout(() => {
+                window.location.href = "https://anbyofficial.github.io/JFT-BASIC-A2/";
+            }, 1500);
+            
+            // Jika pengguna yang membuka halaman login ini sudah terdeteksi login sebelumnya:
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    window.location.href = "https://anbyofficial.github.io/JFT-BASIC-A2/";
+                }
+            });
+                }
+            });
