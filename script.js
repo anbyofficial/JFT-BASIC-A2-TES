@@ -5,10 +5,10 @@ import {
     createUserWithEmailAndPassword, 
     sendPasswordResetEmail, 
     signInWithPopup, 
-    GoogleAuthProvider 
+    GoogleAuthProvider,
+    onAuthStateChanged // Fix 1: Tambahkan import ini
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// Ganti dengan konfigurasi asli dari Firebase Console Anda
 const firebaseConfig = {
     apiKey: "AIzaSyABp1sNwc8ON5LhWvlDFeQLXWztz-mD9G0",
     authDomain: "jft-basic-a2.firebaseapp.com",
@@ -16,10 +16,18 @@ const firebaseConfig = {
     storageBucket: "jft-basic-a2.firebasestorage.app",
     messagingSenderId: "856700351880",
     appId: "1:856700351880:web:a1a126470d664cb453f63d"
-  };
+};
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth();
+
+// Fix 2: Pindahkan pengecekan ke luar (segera berjalan saat halaman dimuat)
+// Jika pengguna terdeteksi SUDAH login, langsung lempar ke repository ujian!
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        window.location.href = "https://anbyofficial.github.io/JFT-BASIC-A2/";
+    }
+});
 
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');
@@ -80,10 +88,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 2. Fitur Toggle Mode (Sign In <-> Sign Up)
-    function setupToggleMode() {
-        const toggleBtn = document.getElementById('toggleModeBtn');
-        if (!toggleBtn) return;
-
+    const toggleBtn = document.getElementById('toggleModeBtn');
+    if (toggleBtn) {
         toggleBtn.addEventListener('click', (e) => {
             e.preventDefault();
             clearErrors();
@@ -103,11 +109,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(btnText) btnText.textContent = "Sign In";
                 if(toggleText) toggleText.innerHTML = `Don't have an account? <a href="#" id="toggleModeBtn">Sign up free</a>`;
             }
-
-            setupToggleMode();
+            // Fix 3: Hapus panggilan setupToggleMode() di dalam event listener
         });
     }
-    setupToggleMode();
 
     // 3. Submit Form Login / Register
     if (loginForm) {
@@ -200,16 +204,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (successTitle) successTitle.textContent = "Google Login Success!";
                     if (successDesc) successDesc.textContent = "Redirecting...";
                     if (successMessage) successMessage.classList.add('show');
-                    // Arahkan ke URL penuh repository ujian
-            setTimeout(() => {
-                window.location.href = "https://anbyofficial.github.io/JFT-BASIC-A2/";
-            }, 1500);
-            
-            // Jika pengguna yang membuka halaman login ini sudah terdeteksi login sebelumnya:
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    window.location.href = "https://anbyofficial.github.io/JFT-BASIC-A2/";
-                }
-            });
-                }
-            });
+                    
+                    setTimeout(() => {
+                        window.location.href = "https://anbyofficial.github.io/JFT-BASIC-A2/";
+                    }, 1500);
+                })
+                .catch((error) => {
+                    alert("Google Sign-In Error: " + error.message);
+                });
+        });
+    }
+});
